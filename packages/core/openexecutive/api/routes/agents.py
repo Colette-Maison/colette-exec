@@ -17,6 +17,7 @@ from openexecutive.agents.overrides import (
     rollback_to,
     set_override,
 )
+from openexecutive.audit.usage import log_model_usage
 
 logger = logging.getLogger(__name__)
 
@@ -460,6 +461,7 @@ async def _test_executive(req: AgentTestRequest) -> str:
         ],
         messages=[{"role": "user", "content": req.query}],
     )
+    log_model_usage(message, model=model, actor="agent_test")
     text_blocks = [b for b in message.content if b.type == "text"]
     return text_blocks[0].text if text_blocks else ""
 
@@ -496,6 +498,9 @@ async def test_agent(agent_id: str, req: AgentTestRequest) -> AgentTestResponse:
             system_prompt_override=req.prompt,
             model_override=req.model,
             deep_reasoning_override=req.use_deep_reasoning,
+            # Sandbox runs must not read as production specialist spend in
+            # the /audit/usage by-source breakdown.
+            actor="agent_test",
         )
     except Exception as exc:  # noqa: BLE001
         logger.exception("Agent test failed for %r", agent_id)
