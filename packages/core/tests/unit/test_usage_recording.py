@@ -100,6 +100,53 @@ def test_analyze_records_usage_under_an_explicit_actor(
     assert [r.actor for r in rows] == ["agent_test"]
 
 
+def test_route_to_specialist_tags_rows_with_the_active_turn(
+    audit: AuditLogger, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A direct router call (a workflow step) records under the
+    ``specialist_workflow`` actor and inherits the active audit turn, which
+    is what lets ``/audit/sessions/{id}`` group the row under its turn."""
+    from openexecutive.audit.context import set_turn
+    from openexecutive.orchestrator import router
+
+    monkeypatch.setattr("openexecutive.agents.overrides.get_override", lambda _name: None)
+    monkeypatch.setitem(router.SPECIALIST_REGISTRY, "unit_agent", _Agent())
+    response = _response(input_tokens=8, output_tokens=3)
+    response.content = [SimpleNamespace(type="text", text="ok")]
+    provider = SimpleNamespace(messages_create=AsyncMock(return_value=response))
+    monkeypatch.setattr("openexecutive.agents.base.get_provider", lambda _m: provider)
+
+    with set_turn(session_id="s-1", turn_id="t-1"):
+        asyncio.run(router.route_to_specialist("unit_agent", "q"))
+
+    rows = audit.query(event_type="cache_event")
+    assert len(rows) == 1
+    assert rows[0].actor == "specialist_workflow"
+    assert rows[0].session_id == "s-1"
+    assert rows[0].turn_id == "t-1"
+
+
+def test_executive_test_box_records_usage(
+    audit: AuditLogger, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The Council's Executive preview is a raw provider call; it records
+    under ``agent_test`` like the specialist test box."""
+    from openexecutive.api.routes.agents import AgentTestRequest, _test_executive
+
+    monkeypatch.setattr("openexecutive.api.routes.agents.get_override", lambda _name: None)
+    response = _response(input_tokens=9, output_tokens=2)
+    response.content = [SimpleNamespace(type="text", text="preview")]
+    provider = SimpleNamespace(messages_create=AsyncMock(return_value=response))
+    monkeypatch.setattr("openexecutive.providers.get_provider", lambda _m: provider)
+
+    text = asyncio.run(_test_executive(AgentTestRequest(query="hi", prompt="P", model="claude-x")))
+
+    assert text == "preview"
+    rows = audit.query(event_type="cache_event")
+    assert [r.actor for r in rows] == ["agent_test"]
+    assert rows[0].details["model"] == "claude-x"
+
+
 def test_triage_records_usage(audit: AuditLogger) -> None:
     from openexecutive.agents.triage import TriageAgent
     from openexecutive.alerts.models import AlertEvent

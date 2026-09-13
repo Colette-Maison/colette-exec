@@ -308,7 +308,9 @@ async def consult_specialist(
     if specialist not in SPECIALIST_REGISTRY:
         valid = ", ".join(sorted(SPECIALIST_REGISTRY))
         raise ValueError(f"Unknown specialist {specialist!r}. Valid: {valid}")
-    return await route_to_specialist(specialist, query, context=context)
+    return await route_to_specialist(
+        specialist, query, context=context, actor="specialist_mcp",
+    )
 
 
 @mcp.tool()

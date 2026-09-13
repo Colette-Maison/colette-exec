@@ -84,7 +84,16 @@ async def route_to_specialist(
     episodic_context: str = "",
     failure_cases: str = "",
     department_memory: str = "",
+    actor: str = "specialist_workflow",
 ) -> str:
+    """Run one specialist and return its prose analysis.
+
+    ``actor`` names the caller on the ``cache_event`` usage row the call
+    records. Direct callers are workflow steps (hence the default);
+    ``route_parallel`` passes ``specialist`` for the Executive's chat-turn
+    consults so the two stay separable in the ``/audit/usage`` by-source
+    breakdown.
+    """
     agent = SPECIALIST_REGISTRY.get(specialist_name)
     if agent is None:
         return f"Unknown specialist: {specialist_name}"
@@ -95,6 +104,7 @@ async def route_to_specialist(
         episodic_context=episodic_context,
         failure_cases=failure_cases,
         department_memory=department_memory,
+        actor=actor,
     )
 
 
@@ -258,6 +268,7 @@ async def route_parallel(
             episodic_context=episodic_context,
             failure_cases=failures_per_call[idx],
             department_memory=dept_memory_per_call[idx],
+            actor="specialist",
         )
         if debug_collector:
             debug_collector.emit("specialist_done", {

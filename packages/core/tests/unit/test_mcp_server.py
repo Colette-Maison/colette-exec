@@ -145,7 +145,9 @@ async def test_consult_specialist_routes_to_specialist() -> None:
     with patch("openexecutive.orchestrator.router.route_to_specialist", new=mock):
         out = await mcp_server.consult_specialist("cfo", "runway?", "context here")
     assert out == "CFO analysis"
-    mock.assert_awaited_once_with("cfo", "runway?", context="context here")
+    mock.assert_awaited_once_with(
+        "cfo", "runway?", context="context here", actor="specialist_mcp",
+    )
 
 
 @pytest.mark.asyncio

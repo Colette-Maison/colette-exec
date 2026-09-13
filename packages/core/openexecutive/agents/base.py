@@ -63,11 +63,11 @@ class BaseAgent(ABC):
     ) -> str:
         """Run one prose specialist call and return its text.
 
-        Every call records a ``cache_event`` usage row under ``actor`` (the
-        Executive's ``consult_specialist`` path uses the default; the
-        Council test box passes ``agent_test``), so consults count toward
-        the session cost summary and ``/audit/usage`` like every other
-        model call.
+        Every call records a ``cache_event`` usage row under ``actor``, so
+        the call counts toward the session cost summary and ``/audit/usage``
+        like every other model call. The router sets ``actor`` per path
+        (``specialist`` for chat-turn consults, ``specialist_workflow`` for
+        workflow steps); the Council test box passes ``agent_test``.
         """
         settings = get_settings()
 

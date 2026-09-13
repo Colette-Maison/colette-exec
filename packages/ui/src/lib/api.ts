@@ -1631,8 +1631,8 @@ export interface UsageByModel extends UsageTotals {
 }
 
 // One row per call source (the audit `actor`): executive, specialist,
-// specialist_research, research_synthesis, research_watchlist, triage,
-// memory_extractor, …
+// specialist_workflow, specialist_research, research_synthesis,
+// research_watchlist, triage, memory_extractor, agent_test, …
 export interface UsageBySource extends UsageTotals {
   source: string;
 }

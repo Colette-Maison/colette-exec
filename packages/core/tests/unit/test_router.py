@@ -39,7 +39,20 @@ def test_route_to_specialist_passes_episodic_to_analyze() -> None:
         episodic_context="EPISODIC",
         failure_cases="",
         department_memory="",
+        actor="specialist_workflow",
     )
+
+
+def test_route_parallel_tags_chat_consults_with_the_specialist_actor() -> None:
+    cso_mock = AsyncMock(return_value="x")
+    with patch.object(SPECIALIST_REGISTRY["cso"], "analyze", cso_mock):
+        asyncio.run(
+            route_parallel(
+                [{"specialist": "cso", "query": "q"}],
+                retrieved_knowledge_map={"cso": ""},
+            )
+        )
+    assert cso_mock.await_args.kwargs["actor"] == "specialist"
 
 
 def test_route_to_specialist_defaults_episodic_to_empty_string() -> None:
