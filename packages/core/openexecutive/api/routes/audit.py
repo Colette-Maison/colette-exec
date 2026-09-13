@@ -137,8 +137,7 @@ class UsageBySource(UsageTotals):
     `specialist` chat-turn consults, `specialist_workflow` steps,
     `specialist_research`, `research_synthesis`, `research_watchlist`,
     `triage`, `memory_extractor`, `agent_test`, … — so a heavy day can be
-    traced to the
-    part of the system that produced it."""
+    traced to the part of the system that produced it."""
     source: str
 
 

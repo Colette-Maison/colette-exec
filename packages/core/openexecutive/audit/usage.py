@@ -14,8 +14,8 @@ The ``actor`` column names the source of the call (``executive``,
 steps, ``specialist_mcp`` for the MCP consult tool, ``specialist_research``,
 ``research_synthesis``, ``research_watchlist``, ``triage``,
 ``memory_extractor``, ``agent_test`` for the Council test boxes), which is
-what the per-source breakdown
-groups on. A research run binds its ``run_id`` in a ContextVar for its
+what the per-source breakdown groups on. A research run binds its
+``run_id`` in a ContextVar for its
 duration so every row the run produces carries it in ``details``; the
 workflow then rolls those rows up into the ``usage`` block on its result.
 """
