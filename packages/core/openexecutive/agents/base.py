@@ -59,7 +59,16 @@ class BaseAgent(ABC):
         system_prompt_override: str | None = None,
         model_override: str | None = None,
         deep_reasoning_override: bool | None = None,
+        actor: str = "specialist",
     ) -> str:
+        """Run one prose specialist call and return its text.
+
+        Every call records a ``cache_event`` usage row under ``actor`` (the
+        Executive's ``consult_specialist`` path uses the default; the
+        Council test box passes ``agent_test``), so consults count toward
+        the session cost summary and ``/audit/usage`` like every other
+        model call.
+        """
         settings = get_settings()
 
         # Resolution order: explicit kwarg (for sandbox/test calls) → DB
@@ -141,6 +150,7 @@ class BaseAgent(ABC):
         # wiring lands in the next commit.
         provider = get_provider(model)
         message = await provider.messages_create(**create_kwargs)
+        log_model_usage(message, model=model, actor=actor)
 
         text_blocks = [b for b in message.content if b.type == "text"]
         if not text_blocks:

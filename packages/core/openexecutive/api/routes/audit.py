@@ -134,8 +134,9 @@ class UsageByModel(UsageTotals):
 
 class UsageBySource(UsageTotals):
     """One row per call source (the audit `actor`): `executive` chat turns,
-    `specialist_research`, `research_synthesis`, `research_watchlist`,
-    `triage`, `memory_extractor`, … — so a heavy day can be traced to the
+    `specialist` consults, `specialist_research`, `research_synthesis`,
+    `research_watchlist`, `triage`, `memory_extractor`, … — so a heavy day
+    can be traced to the
     part of the system that produced it."""
     source: str
 
