@@ -47,9 +47,7 @@ logger = logging.getLogger(__name__)
 # Sorted roster of specialist keys, kept in lockstep with
 # ``orchestrator/router.SPECIALIST_REGISTRY`` by a unit test. Declared as a
 # ``Literal`` so MCP clients see a proper enum in the tool schema.
-SpecialistKey = Literal[
-    "board_comms", "cfo", "chro", "cmo", "coo", "cpo", "cso", "gc", "talent", "triage"
-]
+SpecialistKey = Literal["cfo", "coo", "gc", "talent", "triage"]
 
 _INSTRUCTIONS = (
     "Open Executive exposed as an MCP server. It surfaces a company's "

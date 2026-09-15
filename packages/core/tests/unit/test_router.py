@@ -21,10 +21,10 @@ from openexecutive.orchestrator.router import (  # noqa: E402
 
 def test_route_to_specialist_passes_episodic_to_analyze() -> None:
     analyze_mock = AsyncMock(return_value="analysis result")
-    with patch.object(SPECIALIST_REGISTRY["cso"], "analyze", analyze_mock):
+    with patch.object(SPECIALIST_REGISTRY["gc"], "analyze", analyze_mock):
         result = asyncio.run(
             route_to_specialist(
-                specialist_name="cso",
+                specialist_name="gc",
                 query="strategic question",
                 context="ctx",
                 retrieved_knowledge="rag",
@@ -44,15 +44,15 @@ def test_route_to_specialist_passes_episodic_to_analyze() -> None:
 
 
 def test_route_parallel_tags_chat_consults_with_the_specialist_actor() -> None:
-    cso_mock = AsyncMock(return_value="x")
-    with patch.object(SPECIALIST_REGISTRY["cso"], "analyze", cso_mock):
+    gc_mock = AsyncMock(return_value="x")
+    with patch.object(SPECIALIST_REGISTRY["gc"], "analyze", gc_mock):
         asyncio.run(
             route_parallel(
-                [{"specialist": "cso", "query": "q"}],
-                retrieved_knowledge_map={"cso": ""},
+                [{"specialist": "gc", "query": "q"}],
+                retrieved_knowledge_map={"gc": ""},
             )
         )
-    assert cso_mock.await_args.kwargs["actor"] == "specialist"
+    assert gc_mock.await_args.kwargs["actor"] == "specialist"
 
 
 def test_route_to_specialist_defaults_episodic_to_empty_string() -> None:
@@ -68,24 +68,24 @@ def test_route_parallel_distributes_episodic_to_each_specialist() -> None:
     Passing an empty retrieved_knowledge_map={} short-circuits the per-call
     auto-RAG (which would otherwise call into ChromaDB).
     """
-    cso_mock = AsyncMock(return_value="cso-out")
+    gc_mock = AsyncMock(return_value="gc-out")
     cfo_mock = AsyncMock(return_value="cfo-out")
     with (
-        patch.object(SPECIALIST_REGISTRY["cso"], "analyze", cso_mock),
+        patch.object(SPECIALIST_REGISTRY["gc"], "analyze", gc_mock),
         patch.object(SPECIALIST_REGISTRY["cfo"], "analyze", cfo_mock),
     ):
         results = asyncio.run(
             route_parallel(
                 calls=[
-                    {"specialist": "cso", "query": "strategy q", "context": "c1"},
+                    {"specialist": "gc", "query": "legal q", "context": "c1"},
                     {"specialist": "cfo", "query": "finance q", "context": "c2"},
                 ],
                 retrieved_knowledge_map={},
                 episodic_context="SHARED_PAST_DECISIONS",
             )
         )
-    assert results == ["cso-out", "cfo-out"]
-    assert cso_mock.await_args.kwargs["episodic_context"] == "SHARED_PAST_DECISIONS"
+    assert results == ["gc-out", "cfo-out"]
+    assert gc_mock.await_args.kwargs["episodic_context"] == "SHARED_PAST_DECISIONS"
     assert cfo_mock.await_args.kwargs["episodic_context"] == "SHARED_PAST_DECISIONS"
 
 
@@ -93,25 +93,25 @@ def test_route_parallel_preserves_per_specialist_retrieved_knowledge() -> None:
     """retrieved_knowledge_map is per-specialist; episodic_context is per-turn.
     They must compose independently.
     """
-    cso_mock = AsyncMock(return_value="x")
+    gc_mock = AsyncMock(return_value="x")
     cfo_mock = AsyncMock(return_value="y")
     with (
-        patch.object(SPECIALIST_REGISTRY["cso"], "analyze", cso_mock),
+        patch.object(SPECIALIST_REGISTRY["gc"], "analyze", gc_mock),
         patch.object(SPECIALIST_REGISTRY["cfo"], "analyze", cfo_mock),
     ):
         asyncio.run(
             route_parallel(
                 calls=[
-                    {"specialist": "cso", "query": "q1"},
+                    {"specialist": "gc", "query": "q1"},
                     {"specialist": "cfo", "query": "q2"},
                 ],
-                retrieved_knowledge_map={"cso": "STRAT_RAG", "cfo": "FIN_RAG"},
+                retrieved_knowledge_map={"gc": "LEGAL_RAG", "cfo": "FIN_RAG"},
                 episodic_context="EPISODIC",
             )
         )
-    assert cso_mock.await_args.kwargs["retrieved_knowledge"] == "STRAT_RAG"
+    assert gc_mock.await_args.kwargs["retrieved_knowledge"] == "LEGAL_RAG"
     assert cfo_mock.await_args.kwargs["retrieved_knowledge"] == "FIN_RAG"
-    assert cso_mock.await_args.kwargs["episodic_context"] == "EPISODIC"
+    assert gc_mock.await_args.kwargs["episodic_context"] == "EPISODIC"
     assert cfo_mock.await_args.kwargs["episodic_context"] == "EPISODIC"
 
 

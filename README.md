@@ -1,30 +1,18 @@
-# Open Executive
+# Colette Exec
 
-[![CI](https://github.com/SenteLabsAI/OpenExecutive/actions/workflows/ci.yml/badge.svg)](https://github.com/SenteLabsAI/OpenExecutive/actions/workflows/ci.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Next.js 15](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+Colette's internal virtual C-suite advisor — forked from [Open Executive](https://github.com/SenteLabsAI/OpenExecutive) and scoped down to three specialist seats for our team of three.
 
-An AI system that acts as your company's virtual executive team — a senior advisor with Harvard MBA-level knowledge, customized for your specific business.
-
-## Demo
-
-[![Open Executive demo video](https://img.youtube.com/vi/O_g97xxVTMk/maxresdefault.jpg)](https://youtu.be/O_g97xxVTMk)
-
-A walkthrough of Open Executive in action — [watch on YouTube](https://youtu.be/O_g97xxVTMk).
+An AI system that acts as an internal virtual executive team — a senior advisor with Harvard MBA-level knowledge, grounded in Colette's actual company documents. Not a public product: an internal tool for West (CEO/Chief AI Officer), Wolf (CMO), and Dingus (CPO).
 
 ## What It Does
 
-Developed by [sentelabs.ai](https://sentelabs.ai) Open Executive provides a single coherent executive voice backed by eight specialist AI agents:
+Colette Exec provides a single coherent executive voice backed by three specialist AI agents, covering the functions we don't already own ourselves (Strategy/HR/Marketing/Product/Board Comms stay with West/Wolf/Dingus directly):
 
-- **Chief Strategy Officer** — competitive analysis, M&A, market positioning, OKRs
 - **Chief Financial Officer** — financial modeling, fundraising, unit economics, cash flow
-- **Chief HR/People Officer** — hiring, compensation, performance, culture
 - **General Counsel** — contracts, IP, employment law basics, compliance
 - **Chief Operating Officer** — process design, vendor management, operational scaling
-- **Chief Marketing Officer** — GTM strategy, brand, communications, PR
-- **Chief Product Officer** — roadmap, prioritization, product strategy
-- **Board Communications Director** — board decks, investor relations, governance
+
+Two supporting (non-chat-seat) agents also run: a **Talent** specialist backing the recruiting workflows, and a **Triage** agent that scores inbound events for the alert pipeline.
 
 All responses come from one consistent executive voice. The internal agent architecture is never exposed to the user. Beyond Q&A, the system maintains episodic memory of past decisions and initiatives across sessions, and a built-in scheduler can proactively surface follow-ups and time-sensitive actions.
 
@@ -35,9 +23,9 @@ User message
     ↓
 Executive Orchestrator (claude-sonnet-5)
     ↓ tool use → parallel specialist calls
-CSO / CFO / CHRO / GC / COO / CMO / CPO / Board
+CFO / GC / COO  (+ Talent, Triage as supporting agents)
     ↓ each specialist retrieves relevant context from ChromaDB
-Built-in MBA knowledge + Your company documents
+Built-in MBA knowledge + Colette's company documents
     ↓
 Synthesized executive response
 ```
@@ -58,7 +46,7 @@ See [docs/architecture.md](docs/architecture.md) for the full design.
 |---|---|
 | LLM backbone | Anthropic Claude API |
 | Default model | `claude-sonnet-5` (Executive + most specialists) |
-| Deep reasoning | `claude-opus-5` (CSO, CFO, GC, Board — with extended thinking) |
+| Deep reasoning | `claude-opus-5` (CFO, GC — with extended thinking) |
 | Backend | Python 3.11 + FastAPI |
 | Package manager | `uv` |
 | Vector store | ChromaDB (local, embedded) |
@@ -74,7 +62,7 @@ openexecutive/
 │   ├── core/
 │   │   └── openexecutive/
 │   │       ├── orchestrator/     # Executive persona + routing loop
-│   │       ├── agents/           # 8 specialist agents
+│   │       ├── agents/           # 3 specialist seats + talent/triage support agents
 │   │       ├── knowledge/        # ChromaDB store + RAG pipeline
 │   │       ├── memory/           # Company profile + episodic memory
 │   │       ├── onboarding/       # Wizard state machine + profile builder
@@ -99,8 +87,8 @@ openexecutive/
 
 ```bash
 # Clone the repo
-git clone https://github.com/SenteLabsAI/OpenExecutive.git
-cd OpenExecutive
+git clone https://github.com/Colette-Maison/colette-exec.git
+cd colette-exec
 
 # Set your Anthropic API key
 cp .env.example .env
@@ -238,7 +226,7 @@ the app refuses to start.
 |---|---|---|---|
 | `ANTHROPIC_API_KEY` | Yes¹ | — | Anthropic API key |
 | `DEFAULT_MODEL` | No | `claude-sonnet-5` | Executive + most specialists |
-| `DEEP_REASONING_MODEL` | No | `claude-opus-5` | CSO, CFO, GC, Board |
+| `DEEP_REASONING_MODEL` | No | `claude-opus-5` | CFO, GC |
 | `VECTOR_STORE_PATH` | No | `./chroma_db` | ChromaDB directory |
 | `EPISODIC_DB_PATH` | No | `./episodic_memory.db` | SQLite for episodic memory |
 | `COMPANY_PROFILE_PATH` | No | `./company/profile.yaml` | Company profile |

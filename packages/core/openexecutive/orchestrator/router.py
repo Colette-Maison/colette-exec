@@ -8,39 +8,28 @@ from openexecutive.agents.base import BaseAgent
 
 if TYPE_CHECKING:
     from openexecutive.orchestrator.debug_events import DebugCollector
-from openexecutive.agents.board_comms import BoardCommsAgent
 from openexecutive.agents.finance import FinanceAgent
-from openexecutive.agents.hr_talent import HRAgent
 from openexecutive.agents.legal import LegalAgent
-from openexecutive.agents.marketing import MarketingAgent
 from openexecutive.agents.operations import OperationsAgent
-from openexecutive.agents.product import ProductAgent
-from openexecutive.agents.strategy import StrategyAgent
 from openexecutive.agents.talent import TalentAgent
 from openexecutive.agents.triage import TriageAgent
 
+# Colette-exec runs three specialist seats (CFO/GC/COO) — Strategy, HR,
+# Marketing, Product, and Board Comms are covered directly by West/Wolf/Dingus.
+# Talent and Triage stay registered: they back the recruiting workflows and
+# the alert-triage pipeline respectively, not chat-consult seats.
 SPECIALIST_REGISTRY: dict[str, BaseAgent] = {
-    "cso": StrategyAgent(),
     "cfo": FinanceAgent(),
-    "chro": HRAgent(),
     "gc": LegalAgent(),
     "coo": OperationsAgent(),
-    "cmo": MarketingAgent(),
-    "cpo": ProductAgent(),
-    "board_comms": BoardCommsAgent(),
     "talent": TalentAgent(),
     "triage": TriageAgent(),
 }
 
 SPECIALIST_DESCRIPTIONS = {
-    "cso": "Chief Strategy Officer — competitive analysis, M&A, market positioning, scenario planning, OKRs",
     "cfo": "Chief Financial Officer — financial modeling, unit economics, fundraising, cash flow, board finance",
-    "chro": "Chief HR/People Officer — hiring, compensation, performance management, culture, org design",
     "gc": "General Counsel — contracts, IP, employment law basics, compliance (with appropriate disclaimers)",
     "coo": "Chief Operating Officer — process design, vendor management, operational scaling, metrics",
-    "cmo": "Chief Marketing Officer — GTM strategy, brand, messaging, PR, crisis communications",
-    "cpo": "Chief Product Officer — product roadmap, prioritization frameworks, product strategy",
-    "board_comms": "Board Communications Director — board decks, investor relations, governance",
     "talent": "Head of Talent & Executive Search — candidate screening & fit scoring, executive sourcing, energy-sector talent-market mapping",
     "triage": "Chief of Staff — evaluates inbound events (email/Slack/docs) for significance and decides alerting",
 }

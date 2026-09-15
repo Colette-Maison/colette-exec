@@ -1,8 +1,10 @@
-# Open Executive — Claude Code Context
+# Colette Exec — Claude Code Context
 
 ## Project Overview
 
-Open Executive is a multi-agent AI system acting as a virtual corporate executive. Python backend (FastAPI) + Next.js 15 frontend. The "Executive" is a single coherent persona backed by 8 specialist sub-agents, all powered by the Anthropic Claude API.
+Colette Exec is Colette's internal virtual C-suite advisor, forked from [Open Executive](https://github.com/SenteLabsAI/OpenExecutive) and scoped down for our team of three (West — CEO/Chief AI Officer, Wolf — CMO, Dingus — CPO). Python backend (FastAPI) + Next.js 15 frontend. The "Executive" is a single coherent persona backed by 3 specialist sub-agents (CFO, GC, COO) plus two supporting agents (Talent, Triage) that aren't chat-consult seats, all powered by the Anthropic Claude API.
+
+Not a public product — internal only, sharing the `Colette` GCP project's security posture but with fully isolated data from the family-product tenants.
 
 ## Repository Layout
 
